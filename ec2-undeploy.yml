@@ -1,0 +1,24 @@
+---
+- name: Undeploy Apache & EC2
+  hosts: webserver
+  sudo: yes
+  remote_user: ubuntu
+  gather_facts: False
+  vars:
+   ansible_ssh_private_key_file: keypair.pem
+  tasks:
+   - name: uninstall apache
+     raw: sudo apt-get -y purge apache2 apache2-utils apache2.2-bin
+   - name: autoremove
+     raw: sudo apt-get -y autoremove
+     
+- name: Terminate instances
+  hosts: local
+  connection: local
+  tasks:
+   - name: Terminate EC2 instance
+     local_action:
+       module: ec2
+       state: 'absent'
+       instance_ids: 'i-xxxxxxxxxxxxxx'
+       region: 'us-west-1'
